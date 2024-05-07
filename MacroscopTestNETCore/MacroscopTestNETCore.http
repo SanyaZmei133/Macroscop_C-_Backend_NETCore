@@ -1,0 +1,6 @@
+@MacroscopTestNETCore_HostAddress = http://localhost:5155
+
+GET {{MacroscopTestNETCore_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
