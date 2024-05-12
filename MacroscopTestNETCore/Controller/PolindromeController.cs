@@ -5,57 +5,44 @@ using System.Net.Http;
 using System.Threading;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace MacroscopTestNETCore
+namespace MacroscopTestNETCore.Controller
 {
     [Route("[controller]")]
     [ApiController]
     public class PolindromeController : ControllerBase
     {
         static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(3);
-        private readonly IPolindromeCheck _polindrome;
-        private readonly IStringSeparator _separator;
+        private readonly IPolindomeRepository _polindromeRepository;
 
-        public PolindromeController(IPolindromeCheck polindrome, IStringSeparator separator)
+        public PolindromeController(IPolindomeRepository polindomeRepository)
         {
-            _polindrome = polindrome;
-            _separator = separator;
+            _polindromeRepository = polindomeRepository;
         }
 
         [HttpPost]
-        public async Task <string> Post() 
+        public async Task<string> Post()
         {
-
             using StreamReader reader = new StreamReader(HttpContext.Request.Body);
             string text = await reader.ReadToEndAsync();
 
-            string[] words = _separator.GetWords(text);
-
+            var tasks = new List<Task>();
             string response = " ";
 
-            var tasks = new List<Task>();
-
             await semaphoreSlim.WaitAsync();
-            Thread.Sleep(1000);
             tasks.Add(Task.Run(() =>
             {
                 try
                 {
-                    if (_polindrome.IsPolindrome(words))
-                    {
-                        response = "файл является полиндромом";
-                    }
-                    else
-                    {
-                        response = "файл не является полиндромом";
-                    }
+                    string[] words = _polindromeRepository.GetWords(text);
+                    response = _polindromeRepository.CheckPolindrome(words);
                 }
                 finally
                 {
                     semaphoreSlim.Release();
                 }
-                
             }));
             Task.WaitAll(tasks.ToArray());
+            Thread.Sleep(1000);
             return response;
         }
     }
