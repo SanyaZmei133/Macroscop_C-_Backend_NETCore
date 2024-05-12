@@ -1,5 +1,6 @@
 using MacroscopTestNETCore;
 using MacroscopTestNETCore.Interfaces;
+using MacroscopTestNETCore.Repositories;
 using System.Reflection.Metadata.Ecma335;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddScoped<IPolindromeCheck, PolindromeCheck>();
 builder.Services.AddScoped<IStringSeparator, StringSeparator>();
+builder.Services.AddScoped<IPolindomeRepository, PolindromeRepository>();
 
 var app = builder.Build();
 
